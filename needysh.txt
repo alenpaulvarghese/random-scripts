@@ -1,0 +1,4 @@
+gnome-terminal -e command
+ 9ddac608b13a0514c13e8f0fa142aa8906fb6ddfeb19fbe7f7da7973749a11955d7771414b6a08c4
+db_connect --token 9ddac608b13a0514c13e8f0fa142aa8906fb6ddfeb19fbe7f7da7973749a11955d7771414b6a08c4 --cert /home/stark/.msf4/msf-ws-cert.pem --skip-verify https://localhost:5443
+
