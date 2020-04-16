@@ -26,5 +26,5 @@ while True:
             delete(os.path.join(wallpapper_folder,'wall.jpeg'))
             mover(temp_folder)
             # Change The Value As Your Likings
-            time.sleep(10)
+            time.sleep(100)
         
