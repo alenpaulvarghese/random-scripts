@@ -50,7 +50,7 @@ while True:
             #In Case Of Invalid Input
             else:
                 print('Try Again')
-                pas
+                pass
     #Starting Of Additional  Options Loop
     while True:
         #Confirming To Goto Additional Options
@@ -96,6 +96,7 @@ Please Choose Options:
                     #In Case Of Invalid Input
                     else:
                         print('Try Again1')
+                        pass
 
             #If Addvanced Options Confirmation Is False and 
             #Breaking Advanced Options Loop
