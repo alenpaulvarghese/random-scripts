@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 # (c) AlenPaulVarghese
 import os  
 import json
@@ -11,7 +12,6 @@ import time
 #         "format":"srt"
 #     }
 # }
-
 # try: 
 #     config = open('config.json','r')
 # except FileNotFoundError:
@@ -28,11 +28,8 @@ advanced_query = ''
 #Starting Of Main Loop
 while True:
     input_link = input('link > ')
-    #Checking If The Given Link Is Playlist Or Not
-    playlist_search = input_link.split('/')[3]
-    playlist_search = str(playlist_search.split('?')[0])
     #If Playlist Found
-    if playlist_search == 'playlist':
+    if 'playlist' in input_link:
         print('[?] Playlist found ')
         while True:
             print('')
@@ -60,9 +57,9 @@ while True:
                 #Options Available 
                 print('''
 Please Choose Options:
-1.Playlist Start
-2.Playlist Stop
-3.Subtitle Language
+1.Downloading Path
+2.Playlist Start
+3.Playlist Stop
 4.Subtitle Format
 5.Exit Advanced Option''')
                 #Starting of Secondary Additional Options Loop
@@ -70,22 +67,39 @@ Please Choose Options:
                     advanced = int(input('> '))
                     if advanced == 1 or advanced == 2 or advanced == 3 or advanced == 4 or advanced == 5:
                         #Playlist Start
-                        if advanced == 1:
+                        if advanced == 2:
                             number = int(input('Enter The Playlist Start Number > '))
                             advanced_options_actual+=f'--playlist-start {number} '
                             #For Query Section
                             advanced_query+=f'Playlist Start = {number} '
 
                         #Playlist Stop
-                        if advanced == 2:
+                        if advanced == 3:
                             number = int(input('Enter The Playlist Stop Number > '))
                             advanced_options_actual+=f'--playlist-stop {number} '
                             #For Query Section
                             advanced_query+=f'Playlist Stop = {number}'
 
                         #Not Adding Now
-                        if advanced == 3:
-                            pass
+                        if advanced == 1:
+                            while True:
+                                input_path = str(input('path>'))
+                                home_path = ''
+                                if 'home' in input_path:
+                                    actual_path = input_path
+                                else:
+                                    home_path = os.getcwd().split('/')
+                                    home_path = f'/{home_path[1]}/{home_path[2]}'
+                                    actual_path = os.path.join(home_path,input_path)
+
+                                if os.path.isdir(actual_path):
+                                    downloading_path = actual_path
+                                    os.chdir(actual_path)
+                                    print('Options Saved')
+                                    break
+                                else:
+                                    print('Not A Valid Path or Directory')
+                                    pass
                         if advanced == 4:
                             pass
 
@@ -140,6 +154,7 @@ Please Choose Options:
     print(f'''
     Please Confirm !
     link = {input_link}
+    downloading folder = {os.getcwd()}
     include subtitle = {subtitle_include}
     format = {downloading_resoulution}
     {playlist_query}
