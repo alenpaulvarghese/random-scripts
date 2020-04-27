@@ -76,7 +76,7 @@ Please Choose Options:
                         #Playlist Stop
                         if advanced == 3:
                             number = int(input('Enter The Playlist Stop Number > '))
-                            advanced_options_actual+=f'--playlist-stop {number} '
+                            advanced_options_actual+=f'--playlist-end {number} '
                             #For Query Section
                             advanced_query+=f'Playlist Stop = {number}'
 
