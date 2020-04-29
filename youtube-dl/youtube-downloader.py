@@ -20,14 +20,13 @@ import time
 
 
 #Intialising some Variables
-playlist_query = ''
-is_playlist = ''
-advanced_options_actual = ''
-advanced_query = ''
+command = ['youtube-dl']
+query = []
 
 #Starting Of Main Loop
 while True:
     input_link = input('link > ')
+    query.append(f'Link --> {input_link}')
     #If Playlist Found
     if 'playlist' in input_link:
         print('[?] Playlist found ')
@@ -37,18 +36,18 @@ while True:
             playlist_enable = str(input('[?] Download As Playlist [y/n] > ').lower())
             if playlist_enable == 'y' or playlist_enable == 'n':
                 if playlist_enable == 'y':
-                    is_playlist = '--yes-playlist '
-                    playlist_query = 'downloading as playlist '
+                    command.append('--yes-playlist')
+                    query.append('Downloading as playlist')
                     break
                 else:
-                    is_playlist = '--no-playlist --playlist-start 1 --playlist-end 1 '
-                    playlist_query = ''
+                    command.append('--no-playlist --playlist-start 1 --playlist-end 1')
                     break
             #In Case Of Invalid Input
             else:
                 print('Try Again')
                 pass
-    #Starting Of Additional  Options Loop
+
+#Starting Of Additional  Options Loop
     while True:
         #Confirming To Goto Additional Options
         advanced_option = str(input('[?] Additional Options [Y/N] > ').lower())
@@ -69,18 +68,18 @@ Please Choose Options:
                         #Playlist Start
                         if advanced == 2:
                             number = int(input('Enter The Playlist Start Number > '))
-                            advanced_options_actual+=f'--playlist-start {number} '
+                            command.append(f'--playlist-start {number}')
                             #For Query Section
-                            advanced_query+=f'Playlist Start = {number} '
+                            query.append(f'Playlist Start = {number}')
 
                         #Playlist Stop
                         if advanced == 3:
                             number = int(input('Enter The Playlist Stop Number > '))
-                            advanced_options_actual+=f'--playlist-stop {number} '
+                            command.append(f'--playlist-end {number}')
                             #For Query Section
-                            advanced_query+=f'Playlist Stop = {number}'
+                            query.append(f'Playlist Stop = {number}')
 
-                        #Not Adding Now
+                        
                         if advanced == 1:
                             while True:
                                 input_path = str(input('path>'))
@@ -100,6 +99,7 @@ Please Choose Options:
                                 else:
                                     print('Not A Valid Path or Directory')
                                     pass
+                        #Not Adding Now
                         if advanced == 4:
                             pass
 
@@ -122,22 +122,20 @@ Please Choose Options:
             pass
         #Breaking Advanced Options Loop
         break
-
+    query.append(f'Download Path --> {os.getcwd()}')
     #Subtitle Selection
     while True:
         include_subtitle = str(input('[?] Include Subtitle [y/n] > ').lower())
         if include_subtitle == 'y' or include_subtitle == 'n':   
             if include_subtitle == "y":
                 #For Query Section
-                subtitle_include = 'yes'
+                query.append('Downloading with subtitles')
                 #For Downloading Section
-                include_subtitle = '--write-sub --write-auto-sub'
+                command.append('--write-sub --write-auto-sub --convert-subs srt')
                 break
             else:
                 #For Query Section
-                subtitle_include = 'no'
-                #For Downloading Section
-                include_subtitle = ''
+                query.append('Downloading without subtitles')
                 break
         #In Case Of Invalid Input
         else:
@@ -149,17 +147,16 @@ Please Choose Options:
     print('')
     os.system(f"youtube-dl -F --no-playlist --playlist-start 1 --playlist-end 1 {input_link}")
     downloading_resoulution = input('format_id > ')
+    command.insert(1,f'-f {downloading_resoulution}')
 
+    querys = ''
     #Confirming Everthing
-    print(f'''
-    Please Confirm !
-    link = {input_link}
-    downloading folder = {os.getcwd()}
-    include subtitle = {subtitle_include}
-    format = {downloading_resoulution}
-    {playlist_query}
-    {advanced_query}''')
-
+    print('\t\t'+'Please Confirm !')
+    for helpers in query:
+        querys+= '\t' + helpers + '\n'
+    print(querys)
+    
+    command.append(input_link)
     #Confirmation and Actual Download
     while True:
         confirmed = str(input('[y/n] > ').lower())
@@ -173,7 +170,10 @@ Please Choose Options:
                     time.sleep(1)
                 #Actually This Is The Real Download
                 os.system('echo ')
-                os.system(f"youtube-dl -f {downloading_resoulution} {is_playlist}{advanced_options_actual}{include_subtitle} --convert-subs srt '{input_link}'")
+                execute = ''
+                for helpers in command:
+                    execute += helpers + ' '
+                os.system(execute)
                 break
             #To Reset Everything If Confirmation IS False
             else:
