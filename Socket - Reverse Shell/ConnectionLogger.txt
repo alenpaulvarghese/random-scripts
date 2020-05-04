@@ -1,0 +1,4 @@
+	New Connection
+Name = <socket.socket fd=4, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 9989), raddr=('127.0.0.1', 41566)>
+Address = ('127.0.0.1', 41566)
+
