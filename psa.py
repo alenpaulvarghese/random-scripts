@@ -10,7 +10,7 @@ except ImportError as err:
 	import os 
 	os.system('pip3 install bs4 simple-colors lxml requests')
 
-inital_link = 'https://psarips.xyz/category/tv-show/'
+inital_link = 'https://psarips.xyz/category/movie/'
 dummy = 'https://psarips.xyz'
 
 response = requests.get(inital_link)
@@ -24,7 +24,7 @@ for items in hello:
 	link_to_item = dummy + str(items.find('a').get('href'))
 	content = items.find_all('p')[:]
 	content = [item.get_text() for item in content]
-	update = content[0][10:]
+	update = content[0]
 	category = content[1]
 	author_date = content[2][2:]
 	description = content[3]
@@ -32,12 +32,15 @@ for items in hello:
 
 
 	print(f'\t\t\t\t {green(title,"bold")}   ->  {magenta(author_date,"bright")}') 
-	print(f'{red("Update:","bold")}\n\t{update}')
+	if 'update' in  update:
+		print(f'{red("Update:","bold")}\n\t{update[10:]}')
+	else:
+		print(f'{red("Update:","bold")}\n\t{update}')
 	print(f'{red("category:","bold")}\n\t{category}')
-	print(f'{red("Link:","bold")}\n\t{link_to_item}\n')
+	print(f'{red("Link:","bold")}\n\t{link_to_item}')
 	print(f"{red('Description:','bold')}\n{description}\n\n")
 	time.sleep(0.5)
-	
+
 
 
 # n=1
