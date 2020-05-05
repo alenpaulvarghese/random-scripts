@@ -11,8 +11,9 @@ soup = BeautifulSoup(html,"lxml")
 body = soup.find('div',class_='hu-pad group')
 hello = body.find_all('div',class_=['post-inner','post-hover'])
 for items in hello:
-	print(items.prettify())
-	time.sleep(5)
+	title = items.find('a').get('title')
+	print(title + '\n')
+	time.sleep(3)
 # n=1
 # for x in range(78):
 # 	print(inital_link)
