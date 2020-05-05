@@ -1,2 +1,2 @@
-language = "bash"
-run = ""
+language = ""
+run = "python3 psa.py"
