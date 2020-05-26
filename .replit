@@ -1,2 +1,2 @@
 language = ""
-run = "python3 psa.py"
+run = "python3 pkgs.py"
