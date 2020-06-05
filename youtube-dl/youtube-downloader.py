@@ -75,11 +75,8 @@ Please Choose Options:
                         #Playlist Stop
                         if advanced == 3:
                             number = int(input('Enter The Playlist Stop Number > '))
-<<<<<<< HEAD
                             command.append(f'--playlist-end {number}')
-=======
                             advanced_options_actual+=f'--playlist-end {number} '
->>>>>>> 086c8daf77947afd329eb3681000080eea63d224
                             #For Query Section
                             query.append(f'Playlist Stop = {number}')
 
