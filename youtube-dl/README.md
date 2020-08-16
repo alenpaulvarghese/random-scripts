@@ -1,5 +1,0 @@
-# install
-
-```
-bash install.sh
-```
