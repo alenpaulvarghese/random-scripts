@@ -1,17 +1,14 @@
-from datetime import datetime
-import os
-import requests
 import subprocess
-import time
+import requests
+import os
 import json
-import sys
 
 filebase = input('Enter the file path > ')
 if os.path.isfile(filebase):
     filesize = os.path.getsize(filebase)
     filename = os.path.basename(filebase)
     headers2 = {'Up-User-ID': 'IZfFbjUcgoo3Ao3m'}
-    files2 = {"ttl":604800,"files":[{"name": filename, "type": "", "size": filesize}]}
+    files2 = {"ttl": 604800, "files": [{"name": filename, "type": "", "size": filesize}]}
     r2 = requests.post("https://up.labstack.com/api/v1/links", json=files2, headers=headers2)
     r2json = json.loads(r2.text)
     url = "https://up.labstack.com/api/v1/links/{}/send".format(r2json['code'])
@@ -19,8 +16,8 @@ if os.path.isfile(filebase):
     command_to_exec = [
         "curl",
         "-F", "files=@" + filebase,
-        "-H","Transfer-Encoding: chunked",
-        "-H","Up-User-ID: IZfFbjUcFoo3Ao3m",
+        "-H", "Transfer-Encoding: chunked",
+        "-H", "Up-User-ID: IZfFbjUcFoo3Ao3m",
         url
     ]
     try:
