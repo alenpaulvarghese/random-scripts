@@ -56,7 +56,6 @@ class Crawler(object):
 
     def create(self, structure):
         for is_folder, link, name in structure:
-            print(is_folder, link, name)
             if (is_folder):
                 Crawler.bash_writer(f'mkdir "{name}" && cd "{name}"\n')
                 self.get(link)
@@ -83,8 +82,11 @@ def main():
         link = op.link
     else:
         link = GINDEX.format(op.link)
+    print('Launching Chrome -> ✔️')
     c = Crawler(op.time, op.head, op.write)
+    print('Getting Links -> ✔️')
     c.get(link)
+    print('Finishing Now -> ✔️')
     Crawler.bash_writer('rm link_exec.bash')
     subprocess.run(['chmod', '+x', 'link_exec.bash'])
 
