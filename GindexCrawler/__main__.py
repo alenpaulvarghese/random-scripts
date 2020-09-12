@@ -6,6 +6,7 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium import webdriver
+import subprocess
 import argparse
 import time
 
@@ -55,24 +56,18 @@ class Crawler(object):
 
     def create(self, structure):
         for is_folder, link, name in structure:
+            print(is_folder, link, name)
             if (is_folder):
-                self.indent += 1
-                self.write_head(name)
+                Crawler.bash_writer(f'mkdir "{name}" && cd "{name}"\n')
                 self.get(link)
-                self.indent -= 1
+                Crawler.bash_writer('cd ..\n')
             else:
-                self.writer(link)
+                Crawler.bash_writer(f'aria2c "{link}"\n')
 
-    def writer(self, text):
-        indent = '\t'*self.indent
-        with open(self.filename, "a") as writer:
-            writer.writelines(indent + text)
-            writer.writelines("\n")
-
-    def write_head(self, text):
-        indent = '\t'*(self.indent-1)
-        with open(self.filename, "a") as writer:
-            writer.writelines("\n" + indent + '['+text+']' + "\n")
+    @staticmethod
+    def bash_writer(commands):
+        with open('link_exec.bash', 'a') as writer:
+            writer.writelines(commands)
 
 
 def main():
@@ -80,7 +75,7 @@ def main():
     parser.add_argument('-v', '--version', action='version', version='%(prog)s 1.0')
     parser.add_argument('link', help="Gdrive Index ID or LINK", type=str)
     parser.add_argument('-t', '--time', help="Time to wait for some particular page to load", type=int, default=30, metavar="", choices=range(20, 60))
-    parser.add_argument('-w', '--write', help="Filename to write into", default="links.txt", type=str, metavar="")
+    parser.add_argument('-w', '--write', help="Filename to write into", default="links_exec.bash", type=str, metavar="")
     parser.add_argument('-H', '--head', action="store_true", help="pass to open chrome without headess mode")
     parser.add_argument('-E', '--explicit', action="store_true", help="Explicitly tells the program to identity the input as full link instead of ID")
     op = parser.parse_args()
@@ -90,6 +85,8 @@ def main():
         link = GINDEX.format(op.link)
     c = Crawler(op.time, op.head, op.write)
     c.get(link)
+    Crawler.bash_writer('rm link_exec.bash')
+    subprocess.run(['chmod', '+x', 'link_exec.bash'])
 
 
 if __name__ == "__main__":
