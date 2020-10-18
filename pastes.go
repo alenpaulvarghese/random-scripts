@@ -1,26 +1,8 @@
-// (c) AlenPaulVarghese
-package main
-
-import (
-	"encoding/json"
-	"flag"
-	"fmt"
-	"io/ioutil"
-	"log"
-	"net/http"
-	"net/url"
-	"os"
-	"os/exec"
-	"strings"
-)
-
-const nekobinURL string = "https://nekobin.com/"
-const dogbinURL string = "https://del.dog/"
-
 /*
+(c) AlenPaulVarghese
+
 Available flags :-
 		-f : read from a file
-				usage : -f test.txt
 		-n : use nekobin service
 		-d : use dogbin service
 WARNING: nekobin flag supersedes dogbin flag.
@@ -40,6 +22,23 @@ nekobin: ./pastes -n
 paste the content in nano editor and save the file without renaming.
 --------------------------------------------------------------------------
 */
+package main
+
+import (
+	"encoding/json"
+	"flag"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"net/url"
+	"os"
+	"os/exec"
+	"strings"
+)
+
+const nekobinURL string = "https://nekobin.com/"
+const dogbinURL string = "https://del.dog/"
 
 var responseJSON map[string]interface{}
 
@@ -55,10 +54,10 @@ func main() {
 		dogbin(filereader(*file))
 	default:
 		var message string
-		if len(os.Args) <= 2 {
+		if len(flag.Args()) == 0 {
 			message = nano()
 		} else {
-			message = fmt.Sprint(os.Args[2:])
+			message = fmt.Sprint(flag.Args())
 		}
 		if *neko {
 			nekobin(message)
@@ -70,14 +69,14 @@ func main() {
 
 func nekobin(message string) {
 	payload := url.Values{"content": {message}}
-	resp, err := http.PostForm(nekobinURL+"api/documents", payload)
-	defer resp.Body.Close()
-	if err != nil {
-		log.Fatal("Failed to connect nekobin server!")
+	if resp, err := http.PostForm(nekobinURL+"api/documents", payload); err == nil {
+		defer resp.Body.Close()
+		json.NewDecoder(resp.Body).Decode(&responseJSON)
+		fmt.Println("Your Link --> " + nekobinURL + fmt.Sprint(
+			responseJSON["result"].(map[string]interface{})["key"]))
+	} else {
+		log.Fatal("Failed to connect nekobin server!\n", err)
 	}
-	json.NewDecoder(resp.Body).Decode(&responseJSON)
-	fmt.Println("Your Link --> " + nekobinURL + fmt.Sprint(
-		responseJSON["result"].(map[string]interface{})["key"]))
 }
 
 func dogbin(message string) {
@@ -86,6 +85,8 @@ func dogbin(message string) {
 		defer resp.Body.Close()
 		json.NewDecoder(resp.Body).Decode(&responseJSON)
 		fmt.Println("Your Link --> " + dogbinURL + fmt.Sprint(responseJSON["key"]))
+	} else {
+		log.Fatal("Failed to connect to dogbin server!\n", err)
 	}
 }
 
