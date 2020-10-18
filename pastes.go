@@ -5,6 +5,8 @@ Available flags :-
 		-f : read from a file
 		-n : use nekobin service
 		-d : use dogbin service
+INFO: to use dogbin api key while building use the following bulid command
+	command: go build -ldflags="-X main.dogbinAPI=yourapikey" pastes.go
 WARNING: nekobin flag supersedes dogbin flag.
 --------------------------------------------------------------------------
 Read from file -->
@@ -40,9 +42,7 @@ import (
 const nekobinURL string = "https://nekobin.com/"
 const dogbinURL string = "https://del.dog/"
 
-// leave blank if u dont want to use api
-const dogbinAPI string = ""
-
+var dogbinAPI string = ""
 var responseJSON map[string]interface{}
 
 func main() {
