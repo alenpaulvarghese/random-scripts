@@ -40,6 +40,9 @@ import (
 const nekobinURL string = "https://nekobin.com/"
 const dogbinURL string = "https://del.dog/"
 
+// leave blank if u dont want to use api
+const dogbinAPI string = ""
+
 var responseJSON map[string]interface{}
 
 func main() {
@@ -57,7 +60,7 @@ func main() {
 		if len(flag.Args()) == 0 {
 			message = nano()
 		} else {
-			message = fmt.Sprint(flag.Args())
+			message = strings.Join(flag.Args(), " ")
 		}
 		if *neko {
 			nekobin(message)
@@ -81,7 +84,13 @@ func nekobin(message string) {
 
 func dogbin(message string) {
 	status := strings.NewReader(message)
-	if resp, err := http.Post(dogbinURL+"documents", "text/plain; charset=UTF-8", status); err == nil {
+	client := &http.Client{}
+	request, _ := http.NewRequest("POST", dogbinURL+"documents", status)
+	if dogbinAPI != "" {
+		request.Header.Set("X-Api-Key", dogbinAPI)
+	}
+	request.Header.Set("Content-Type", "text/plain; charset=UTF-8")
+	if resp, err := client.Do(request); err == nil {
 		defer resp.Body.Close()
 		json.NewDecoder(resp.Body).Decode(&responseJSON)
 		fmt.Println("Your Link --> " + dogbinURL + fmt.Sprint(responseJSON["key"]))
