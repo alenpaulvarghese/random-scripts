@@ -1,26 +1,30 @@
 /*
 (c) AlenPaulVarghese
 
+__version__: 2.0
+
 Available flags :-
 		-f : read from a file
 		-n : use nekobin service
 		-d : use dogbin service
 INFO: to use dogbin api key while building use the following bulid command
 	command: go build -ldflags="-X main.dogbinAPI=yourapikey" pastes.go
-WARNING: nekobin flag supersedes dogbin flag.
 --------------------------------------------------------------------------
 Read from file -->
-dogbin: ./pastes -d -f filename.txt or ./pastes -f filename.txt
-nekobin: ./pastes -n -f filename.txt
-WARNING: make sure file flage `-f` should'nt be placed before other flags.
+dogbin   : ./pastes -d -f filename.txt or ./pastes -f filename.txt
+nekobin  : ./pastes -n -f filename.txt
+hastebin : ./pastes -h -f filename.txt
+WARNING  : make sure file flag `-f` should'nt be placed before other flags.
 --------------------------------------------------------------------------
 To get short links -->
-dogbin: ./pastes https://example.com or ./pastes -d https://example.com
-nekobin: ./pastes -n https://example.com
+dogbin   : ./pastes https://example.com or ./pastes -d https://example.com
+nekobin  : ./pastes -n https://example.com
+hastebin : ./pastes -d https://example.com
 --------------------------------------------------------------------------
 For multiline -->
-dobin: ./pastes -d or ./pastes
-nekobin: ./pastes -n
+dobin    : ./pastes -d or ./pastes
+nekobin  : ./pastes -n
+hastebin : ./pastes -h
 paste the content in nano editor and save the file without renaming.
 --------------------------------------------------------------------------
 */
@@ -39,22 +43,30 @@ import (
 	"strings"
 )
 
-const nekobinURL string = "https://nekobin.com/"
-const dogbinURL string = "https://del.dog/"
+const (
+	hastebinURL = "https://hastebin.com/"
+	nekobinURL  = "https://nekobin.com/"
+	dogbinURL   = "https://del.dog/"
+)
 
-var dogbinAPI string = ""
-var responseJSON map[string]interface{}
+var (
+	file      = flag.String("f", "", "file path to read from")
+	haste     = flag.Bool("h", false, "use hastebin")
+	neko      = flag.Bool("n", false, "use nekobin")
+	dog       = flag.Bool("d", false, "use dogbin")
+	client    = &http.Client{}
+	link      = ""
+	dogbinAPI = ""
+)
 
 func main() {
-	file := flag.String("f", "", "file path to read from")
-	dog := flag.Bool("d", false, "use dogbin")
-	neko := flag.Bool("n", false, "use nekobin")
 	flag.Parse()
+	var id string
 	switch true {
 	case *file != "" && *neko:
-		nekobin(filereader(*file))
-	case *file != "" && *dog, (*file != ""):
-		dogbin(filereader(*file))
+		nekobin(filereader(*file), &id)
+	case *file != "" && *haste, (*file != ""):
+		paster(filereader(*file), &id)
 	default:
 		var message string
 		if len(flag.Args()) == 0 {
@@ -63,40 +75,49 @@ func main() {
 			message = strings.Join(flag.Args(), " ")
 		}
 		if *neko {
-			nekobin(message)
+			nekobin(message, &id)
 		} else {
-			dogbin(message)
+			paster(message, &id)
 		}
 	}
+	fmt.Printf("Your Link --> %s\nRaw Link  --> %s\n", link+id, link+"raw/"+id)
 }
 
-func nekobin(message string) {
-	payload := url.Values{"content": {message}}
-	if resp, err := http.PostForm(nekobinURL+"api/documents", payload); err == nil {
-		defer resp.Body.Close()
-		json.NewDecoder(resp.Body).Decode(&responseJSON)
-		fmt.Println("Your Link --> " + nekobinURL + fmt.Sprint(
-			responseJSON["result"].(map[string]interface{})["key"]))
-	} else {
-		log.Fatal("Failed to connect nekobin server!\n", err)
+func nekobin(message string, id *string) {
+	link = nekobinURL
+	payload := strings.NewReader(url.Values{"content": {message}}.Encode())
+	request, _ := http.NewRequest(http.MethodPost, nekobinURL+"api/documents", payload)
+	request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	resp, err := client.Do(request)
+	if err != nil {
+		log.Fatalf("Failed to connect to %s server", nekobinURL)
 	}
+	defer resp.Body.Close()
+	var m map[string]interface{}
+	json.NewDecoder(resp.Body).Decode(&m)
+	*id = (fmt.Sprint(m["result"].(map[string]interface{})["key"]))
 }
 
-func dogbin(message string) {
+func paster(message string, id *string) {
+	if *haste {
+		link = hastebinURL
+	} else {
+		link = dogbinURL
+	}
 	status := strings.NewReader(message)
-	client := &http.Client{}
-	request, _ := http.NewRequest("POST", dogbinURL+"documents", status)
-	if dogbinAPI != "" {
+	request, _ := http.NewRequest("POST", link+"documents", status)
+	request.Header.Set("Content-Type", "text/plain; charset=UTF-8")
+	if dogbinAPI != "" && !*haste {
 		request.Header.Set("X-Api-Key", dogbinAPI)
 	}
-	request.Header.Set("Content-Type", "text/plain; charset=UTF-8")
-	if resp, err := client.Do(request); err == nil {
-		defer resp.Body.Close()
-		json.NewDecoder(resp.Body).Decode(&responseJSON)
-		fmt.Println("Your Link --> " + dogbinURL + fmt.Sprint(responseJSON["key"]))
-	} else {
-		log.Fatal("Failed to connect to dogbin server!\n", err)
+	resp, err := client.Do(request)
+	if err != nil {
+		log.Fatalf("Failed to connect to %s server", link)
 	}
+	defer resp.Body.Close()
+	var m map[string]interface{}
+	json.NewDecoder(resp.Body).Decode(&m)
+	*id = fmt.Sprint(m["key"])
 }
 
 func filereader(filename string) string {
