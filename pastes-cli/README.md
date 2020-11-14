@@ -13,9 +13,9 @@ A handy CLI tool build using go to make quick and easy pastes.
 
 ## Available flags :-
         +-----------------------------+
-	|  -f : read from a file      |
-     	|  -n : use nekobin service   |
-	|  -d : use dogbin service    |
+	    |  -f : read from a file      |
+	    |  -n : use nekobin service   |
+	    |  -d : use dogbin service    |
         +-----------------------------+
         +-------------------------------------+
         | -g : use github-gist service        |
